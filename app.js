@@ -75,10 +75,18 @@ const mensaje = document.querySelector("#mensaje");
 
 function init() {
   // TODO: registrar los eventos de los botones (click)
-  btnAgregar.addEventListener("click", agregarNota());
-  btnOrdenAsc.addEventListener("click", ordenarAsc());
-  btnOrdenDesc.addEventListener("click", ordenarDesc());
-  btnLimpiar.addEventListener("click", limpiarTodo());
+  btnAgregar.addEventListener("click", () => {
+    agregarNota();
+  });
+  btnOrdenAsc.addEventListener("click", () =>{
+    ordenarDesc();
+  });
+  btnOrdenDesc.addEventListener("click", ()=>{
+    ordenarAsc();
+  });
+  btnLimpiar.addEventListener("click", () =>{
+    limpiarTodo();
+  });
 
   // TODO: registrar el evento "Enter" en el input para que sea equivalente a añadir
   notaInput.addEventListener("keydown", (event) => {
@@ -86,9 +94,7 @@ function init() {
         agregarNota();
     }
   });
-
-  // TODO: pintar el estado inicial (lista + resumen)
-  render();
+  
 }
 
 init();
@@ -106,21 +112,19 @@ init();
 
 function agregarNota() {
   // TODO: leer el valor del input
-  notas = notaInput.value;
   // TODO: convertirlo a número
-  Number(notaInput);
   // TODO: validar que sea un número válido y esté entre 0 y 10
-  if (isNaN(notaInput) && notaInput < 0 || notaInput > 10) {
-    notas.push(notaInput);
+  if (isNaN(notaInput.value) || notaInput.value === "") {
+    mostrarMensaje("Debes introducir un número entre 0 y 10");
+  } else if (Number(notaInput.value) >= 0 && Number(notaInput.value) <= 10) {
+    notas.push(Number(notaInput.value));
   } else {
-    mostrarMensaje("Debes introducir una nota");
+    mostrarMensaje("Debes introducir un número entre 0 y 10");
   }
+    notaInput.value = "";
   // TODO: si hay error, mostrar mensaje y salir
-
   // TODO: si es correcto, hacer push al array "notas"
-
   // TODO: limpiar el input y devolver el foco al input
-
   // TODO: llamar a render()
   render();
 }
@@ -135,7 +139,6 @@ function ordenarAsc() {
     return a - b;
   });
   // TODO: ordenar el array de menor a mayor (recuerda que sort necesita comparador numérico)
-
   // TODO: llamar a render()
   render();
 }
@@ -160,9 +163,8 @@ function ordenarDesc() {
  */
 
 function limpiarTodo() {
-  notas.length = 0;
+  notas = [];
   // TODO: vaciar el array de notas
-  
   // TODO: llamar a render()
   render();
 }
@@ -199,7 +201,7 @@ function pintarLista() {
   // TODO: añadir cada <li> al <ul>
   for (let i = 0; i < notas.length; i++) {
     const nota = document.createElement("li");
-    nota.textContent = notas.value;
+    nota.textContent = notas[i];
     listaNotas.appendChild(nota);
   }
 }
@@ -216,18 +218,14 @@ function pintarLista() {
  */
 function pintarResumen() {
   if (notas.length === 0) {
-    mostrarMensaje("Aún no hay notas");
+    txtResumen.innerHTML = "Aún no hay nota";
   } else {
-    const media = calcularMedia(notas);
-    const maxNota = calcularMax(notas);
-    const minNota = calcularMin(notas);
-    const aprobados = contarAprobados(notas);
+    txtResumen.innerHTML = `Media: ${calcularMedia(notas)}<br>
+    Nota más alta: ${calcularMax(notas)}<br>
+    Nota más baja: ${calcularMin(notas)}<br>
+    Aprobados: ${contarAprobados(notas)}<br>
+    Suspensos: ${notas.length-contarAprobados(notas)}`;
   }
-
-  txtResumen.textContent = `Media: ${media}
-  Nota más Alta: ${maxNota}
-  Nota más Baja: ${minNota}
-  Aprobados: ${aprobados}`
   // TODO: si no hay notas, mostrar "Aún no hay notas."
   // TODO: si hay notas, calcular todos los valores (media, max, min, etc.)
   // TODO: construir un texto resumen y asignarlo a txtResumen.textContent
@@ -244,12 +242,11 @@ function pintarResumen() {
  * @returns {number} Media de los valores.
  */
 function calcularMedia(array) {
-  const sum = 0;
-  const media = 0;
+  let media = 0;
   for (let i = 0; i < array.length; i++) {
-    sum += i; 
-    media = sum / array.length;
+    media += array[i]; 
   }
+  media /= array.length;
   return media;
   // TODO: sumar todos los elementos y dividir entre array.length
 }
@@ -277,7 +274,7 @@ function calcularMax(array) {
  * @returns {number} Valor mínimo.
  */
 function calcularMin(array) {
-  let minNota = 0;
+  let minNota = array[0];
   for (let i = 0; i < array.length; i++) {
     if (array[i] < minNota) {
       minNota = array[i];
@@ -315,11 +312,9 @@ function contarAprobados(array) {
  * @returns {void}
  */
 function mostrarMensaje(texto) {
-  mensaje.textContent = texto;
-  mensaje.classList.add("mensaje");
-  setTimeout(function(){
-    mensaje.textContent = "";
-    mensaje.classList.remove("mensaje");
+  mensaje.innerHTML = `${texto}<br>`;
+  setTimeout(function() {
+    limpiarMensaje();
   }, 2000);
   // TODO: mostrar texto
   // TODO: programar que se borre después de X ms con setTimeout
