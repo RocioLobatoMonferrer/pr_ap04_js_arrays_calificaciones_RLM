@@ -15,7 +15,7 @@
  * Array principal donde se almacenan todas las notas introducidas.
  * @type {number[]}
  */
-let notas = []; // TODO: este array será el que uses en toda la práctica
+let notas = JSON.parse(localStorage.getItem("notas")) || []; // TODO: este array será el que uses en toda la práctica
 
 
 /* ==========================================================
@@ -74,7 +74,11 @@ const mensaje = document.querySelector("#mensaje");
  */
 
 function init() {
+
+  render();
+
   // TODO: registrar los eventos de los botones (click)
+  // Otra manera de poner las funciones: btnAgregarNota.addEventListener("click", agregarNota); si pongo agregarNota() da fallo ya que es undefined
   btnAgregar.addEventListener("click", () => {
     agregarNota();
   });
@@ -92,9 +96,9 @@ function init() {
   notaInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         agregarNota();
+        // si es formulario, event.preventDefault
     }
   });
-  
 }
 
 init();
@@ -111,7 +115,7 @@ init();
  */
 
 function agregarNota() {
-  // TODO: leer el valor del input
+  // TODO: leer el valor del input --> const nota = Number(notaInput.value)
   // TODO: convertirlo a número
   // TODO: validar que sea un número válido y esté entre 0 y 10
   if (isNaN(notaInput.value) || notaInput.value === "") {
@@ -122,6 +126,7 @@ function agregarNota() {
     mostrarMensaje("Debes introducir un número entre 0 y 10");
   }
     notaInput.value = "";
+    notaInput.focus();
   // TODO: si hay error, mostrar mensaje y salir
   // TODO: si es correcto, hacer push al array "notas"
   // TODO: limpiar el input y devolver el foco al input
@@ -139,6 +144,9 @@ function ordenarAsc() {
     return a - b;
   });
   // TODO: ordenar el array de menor a mayor (recuerda que sort necesita comparador numérico)
+
+  // función flecha: notas.sort((a,b) => a - b); devuelve true/false
+
   // TODO: llamar a render()
   render();
 }
@@ -164,6 +172,8 @@ function ordenarDesc() {
 
 function limpiarTodo() {
   notas = [];
+  // tamb vale --> notas.lenght = 0;
+  localStorage.clear;
   // TODO: vaciar el array de notas
   // TODO: llamar a render()
   render();
@@ -184,6 +194,7 @@ function limpiarTodo() {
 function render() {
   pintarLista();
   pintarResumen();
+  localStorage.setItem("notas",JSON.stringify(notas));
   // TODO: llamar a pintarLista()
   // TODO: llamar a pintarResumen()
 }
@@ -194,7 +205,7 @@ function render() {
  */
 
 function pintarLista() {
-  listaNotas.innerHTML = "";
+  listaNotas.textContent = "";
   // TODO: vaciar listaNotas (innerHTML)
 
   // TODO: recorrer "notas" y crear un <li> por cada nota
@@ -220,7 +231,7 @@ function pintarResumen() {
   if (notas.length === 0) {
     txtResumen.innerHTML = "Aún no hay nota";
   } else {
-    txtResumen.innerHTML = `Media: ${calcularMedia(notas)}<br>
+    txtResumen.innerHTML = `Media: ${calcularMedia(notas).toFixed(2)}<br>
     Nota más alta: ${calcularMax(notas)}<br>
     Nota más baja: ${calcularMin(notas)}<br>
     Aprobados: ${contarAprobados(notas)}<br>
